@@ -40,9 +40,12 @@ export async function phishEmployee(req, res, next) {
   try {
     const phish = new Phish({
       recipient: email,
-      content: "Hello child",
       status: "Pending",
     });
+
+    const content = `<a href="http://localhost:5000/phishes/clicked/${phish._id}" target="_blank">Click here</a>`;
+
+    phish.content = content;
 
     await phish.save();
 
@@ -60,7 +63,7 @@ export async function phishEmployee(req, res, next) {
       from: process.env.SMTP_EMAIL,
       to: email,
       subject: "Hello",
-      html: `<a href="http://localhost:5000/phishes/clicked/${phish._id}" target="_blank">Click here</a>`,
+      html: content,
     });
 
     res.status(201).json({});
