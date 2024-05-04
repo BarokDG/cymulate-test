@@ -29,8 +29,8 @@ export default function ActivePhishes() {
       });
   }, []);
 
-  if (!phishes?.data) {
-    return;
+  if (!phishes?.data || phishes.count === 0) {
+    return <h1>Nothing to show</h1>;
   }
 
   return (
