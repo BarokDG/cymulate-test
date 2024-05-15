@@ -29,7 +29,9 @@ export class PhishService {
   }
 
   findAll() {
-    return this.phishModel.find();
+    return this.phishModel.find().sort({
+      createdAt: 'desc',
+    });
   }
 
   findOne(id: string) {

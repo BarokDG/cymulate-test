@@ -29,18 +29,28 @@ export default function PhishForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Email</label>
-      <input
-        type="email"
-        name="email"
-        id="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
+    <div className="bg-blue-50 border-b-blue-200 border-b-2">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 max-w-96 w-full mx-auto py-10"
+      >
+        <div className="flex flex-col">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="border border-black px-2"
+          />
+        </div>
 
-      <button type="submit">Phish</button>
-    </form>
+        <button type="submit" className="bg-black/80 text-white">
+          Phish
+        </button>
+      </form>
+    </div>
   );
 }

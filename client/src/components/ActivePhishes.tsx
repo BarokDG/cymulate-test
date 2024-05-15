@@ -1,20 +1,11 @@
 import { useEffect, useState } from "react";
 import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
+import Phish from "./Phish";
 
-interface Collection<T> {
-  count: number;
-  data: T[];
-}
-
-interface Phish {
-  _id: string;
-  recipient: string;
-  content: string;
-  status: "Failed" | "Pending";
-}
+import { Phish as PhishType } from "../lib/types";
 
 export default function ActivePhishes() {
-  const [phishes, setPhishes] = useState<Collection<Phish>>();
+  const [phishes, setPhishes] = useState<PhishType[] | null>(null);
 
   useEffect(() => {
     const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
@@ -30,18 +21,15 @@ export default function ActivePhishes() {
       });
   }, []);
 
-  if (!phishes?.data || phishes.count === 0) {
+  if (!phishes || phishes.length === 0) {
     return <h1>Nothing to show</h1>;
   }
 
   return (
-    <ol>
-      {phishes?.data.map(({ _id, content, recipient, status }) => (
-        <li key={_id}>
-          <div>id: {_id}</div>
-          <div>content: {content}</div>
-          <div>to: {recipient}</div>
-          <div>status: {status}</div>
+    <ol className="grid grid-cols-3 gap-10 p-10">
+      {phishes?.map((phish) => (
+        <li key={phish._id}>
+          <Phish {...phish} />
         </li>
       ))}
     </ol>
