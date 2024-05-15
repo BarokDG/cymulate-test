@@ -5,7 +5,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
 
 @UseGuards(AuthGuard)
-@Controller('phishes')
+@Controller('phish')
 export class PhishController {
   constructor(private readonly phishService: PhishService) {}
 

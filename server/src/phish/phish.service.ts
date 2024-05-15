@@ -14,7 +14,7 @@ export class PhishService {
 
   async create(createPhishDto: CreatePhishDto) {
     const createdPhish = new this.phishModel(createPhishDto);
-    const content = `<a href="http://localhost:3001/phishes/clicked/${createdPhish._id}" target="_blank">Click here</a>`;
+    const content = `<a href="http://localhost:3001/phish/clicked/${createdPhish._id}" target="_blank">Click here</a>`;
     createdPhish.content = content;
 
     await createdPhish.save();
