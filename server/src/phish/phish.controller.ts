@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { PhishService } from './phish.service';
 import { CreatePhishDto } from './dto/create-phish.dto';
 
-@Controller('phish')
+@Controller('phishes')
 export class PhishController {
   constructor(private readonly phishService: PhishService) {}
 
@@ -22,5 +22,7 @@ export class PhishController {
   }
 
   @Get('clicked/:id')
-  updateStatus(@Param('id') id: string) {}
+  updateStatus(@Param('id') id: string) {
+    return this.phishService.update(id);
+  }
 }
