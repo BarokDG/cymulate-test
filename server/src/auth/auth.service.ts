@@ -29,4 +29,12 @@ export class AuthService {
     await this.usersService.create(email, password);
     return;
   }
+
+  async verify(token: string) {
+    try {
+      this.jwtService.verify(token);
+    } catch {
+      throw new UnauthorizedException();
+    }
+  }
 }
