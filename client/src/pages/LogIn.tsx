@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { LocalStorageKeys, setItemToLocalStorage } from "../lib/localStorage";
 
 export default function LogIn() {
   const navigate = useNavigate();
@@ -33,9 +34,9 @@ export default function LogIn() {
         throw new Error();
       }
 
-      const data: { token: string } = await result.json();
+      const data: { access_token: string } = await result.json();
 
-      localStorage.setItem("token", data.token);
+      setItemToLocalStorage(LocalStorageKeys.ACCESS_TOKEN, data.access_token);
 
       navigate("/dashboard");
     } catch (error) {

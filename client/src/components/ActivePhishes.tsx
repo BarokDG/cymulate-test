@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
 
 interface Collection<T> {
   count: number;
@@ -16,7 +17,7 @@ export default function ActivePhishes() {
   const [phishes, setPhishes] = useState<Collection<Phish>>();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
 
     fetch(`${import.meta.env.VITE_API_URL}/phish`, {
       headers: {

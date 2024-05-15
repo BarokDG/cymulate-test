@@ -1,9 +1,10 @@
 import { FormEvent, useState } from "react";
+import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
 
 export default function PhishForm() {
   const [email, setEmail] = useState("");
 
-  const token = localStorage.getItem("token");
+  const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
