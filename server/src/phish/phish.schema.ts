@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type PhishDocument = HydratedDocument<Phish>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Phish {
   @Prop({ required: true })
   recipient: string;

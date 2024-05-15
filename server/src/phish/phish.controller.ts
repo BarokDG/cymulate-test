@@ -20,4 +20,7 @@ export class PhishController {
   findOne(@Param('id') id: string) {
     return this.phishService.findOne(id);
   }
+
+  @Get('clicked/:id')
+  updateStatus(@Param('id') id: string) {}
 }

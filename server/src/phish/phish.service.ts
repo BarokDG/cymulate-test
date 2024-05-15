@@ -13,14 +13,21 @@ export class PhishService {
     const content = `<a href="http://localhost:5000/phishes/clicked/${createdPhish._id}" target="_blank">Click here</a>`;
     createdPhish.content = content;
 
-    return createdPhish.save();
+    await createdPhish.save();
+
+    return;
   }
 
   findAll() {
-    return this.phishModel.find().exec();
+    return this.phishModel.find();
   }
 
   findOne(id: string) {
     return this.phishModel.findById(id);
+  }
+
+  async update(id: string) {
+    await this.phishModel.findByIdAndUpdate(id, { status: 'Successful' });
+    return;
   }
 }
