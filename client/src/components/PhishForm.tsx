@@ -8,7 +8,7 @@ export default function PhishForm() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const result = await fetch(`${import.meta.env.VITE_API_URL}/phishes/send`, {
+    const result = await fetch(`${import.meta.env.VITE_API_URL}/phish`, {
       method: "POST",
       body: JSON.stringify({
         email,

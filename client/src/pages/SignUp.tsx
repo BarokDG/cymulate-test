@@ -12,7 +12,7 @@ export default function SignUp() {
 
     try {
       const result = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/signup`,
+        `${import.meta.env.VITE_API_URL}/auth/sign-up`,
         {
           method: "POST",
           body: JSON.stringify({

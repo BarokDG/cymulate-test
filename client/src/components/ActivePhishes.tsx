@@ -18,7 +18,7 @@ export default function ActivePhishes() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`${import.meta.env.VITE_API_URL}/phishes/getAll`, {
+    fetch(`${import.meta.env.VITE_API_URL}/phish`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

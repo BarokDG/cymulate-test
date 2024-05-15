@@ -11,16 +11,19 @@ export default function LogIn() {
     e.preventDefault();
 
     try {
-      const result = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-        headers: {
-          "Content-type": "application/json",
-        },
-      });
+      const result = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/sign-in`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
 
       if (!result.ok) {
         alert("Please check your email and password and try again!");
