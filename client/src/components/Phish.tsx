@@ -36,7 +36,7 @@ export default function Phish({ _id, content, recipient, status }: Props) {
             dangerouslySetInnerHTML={{
               __html: content,
             }}
-            className="h-48 overflow-auto bg-white p-2"
+            className="h-48 overflow-auto bg-white p-2 pointer-events-none"
           />
         ) : (
           <div className="break-words p-2 bg-white h-48 overflow-auto">

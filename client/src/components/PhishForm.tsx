@@ -3,16 +3,19 @@ import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
 
 export default function PhishForm() {
   const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
 
   const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    setStatus("submitting");
+
     const result = await fetch(`${import.meta.env.VITE_API_URL}/phish`, {
       method: "POST",
       body: JSON.stringify({
-        email,
+        recipient: email,
       }),
       headers: {
         Authorization: `Bearer ${token}`,
@@ -26,6 +29,7 @@ export default function PhishForm() {
     }
 
     alert("Phish email sent!");
+    window.location.reload();
   };
 
   return (
@@ -47,8 +51,12 @@ export default function PhishForm() {
           />
         </div>
 
-        <button type="submit" className="bg-black/80 text-white">
-          Phish
+        <button
+          type="submit"
+          className="bg-black/80 hover:bg-black text-white disabled:opacity-40"
+          disabled={status === "submitting"}
+        >
+          {status === "submitting" ? "Phishing" : "Phish"}
         </button>
       </form>
     </div>
