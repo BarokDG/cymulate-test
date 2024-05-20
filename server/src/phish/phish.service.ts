@@ -28,10 +28,28 @@ export class PhishService {
     return;
   }
 
-  findAll() {
-    return this.phishModel.find().sort({
-      createdAt: 'desc',
-    });
+  async findAll(limit: number, page: number) {
+    const count = await this.phishModel.countDocuments();
+
+    if (count === 0) {
+      return {
+        data: [],
+        count: 0,
+      };
+    }
+
+    const data = await this.phishModel
+      .find()
+      .sort({
+        createdAt: 'desc',
+      })
+      .skip(limit * (page - 1))
+      .limit(limit);
+
+    return {
+      data,
+      count,
+    };
   }
 
   findOne(id: string) {

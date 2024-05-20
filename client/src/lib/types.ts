@@ -6,3 +6,8 @@ export interface Phish {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Collection<T> {
+  data: T[];
+  count: number;
+}

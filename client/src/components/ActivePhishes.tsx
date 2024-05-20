@@ -1,26 +1,33 @@
-import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
-import PhishCard from "./PhishCard";
-
-import { Phish as PhishType } from "../lib/types";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import Pagination from "rc-pagination";
+
+import PhishCard from "./PhishCard";
+import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
+import { Collection, Phish as PhishType } from "../lib/types";
 
 export default function ActivePhishes() {
+  const [page, setPage] = useState(1);
+
   const {
     data: phishes,
     isPending,
     isFetching,
     isError,
     refetch,
-  } = useQuery<PhishType[]>({
-    queryKey: ["phishes"],
+  } = useQuery<Collection<PhishType>>({
+    queryKey: ["phishes", page],
     queryFn: () => {
       const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
 
-      return fetch(`${import.meta.env.VITE_API_URL}/phish`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }).then((response) => response.json());
+      return fetch(
+        `${import.meta.env.VITE_API_URL}/phish?page=${page}&limit=5`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ).then((response) => response.json());
     },
   });
 
@@ -48,7 +55,7 @@ export default function ActivePhishes() {
     );
   }
 
-  if (phishes.length === 0) {
+  if (phishes.count === 0) {
     return (
       <div className="flex-grow flex justify-center items-center">
         <h1 className="text-lg text-center">
@@ -62,12 +69,19 @@ export default function ActivePhishes() {
     <div className="p-10">
       {isFetching && <p className="mb-2">Updating...</p>}
       <ol className="grid grid-cols-3 gap-10">
-        {phishes?.map((phish) => (
+        {phishes?.data.map((phish) => (
           <li key={phish._id}>
             <PhishCard {...phish} clickable />
           </li>
         ))}
       </ol>
+
+      <Pagination
+        current={page}
+        pageSize={5}
+        total={phishes.count}
+        onChange={(newPage) => setPage(newPage)}
+      />
     </div>
   );
 }

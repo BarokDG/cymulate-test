@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { PhishService } from './phish.service';
 import { CreatePhishDto } from './dto/create-phish.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -15,8 +23,8 @@ export class PhishController {
   }
 
   @Get()
-  findAll() {
-    return this.phishService.findAll();
+  findAll(@Query('limit') limit: number, @Query('page') page: number) {
+    return this.phishService.findAll(limit, page);
   }
 
   @Get(':id')
