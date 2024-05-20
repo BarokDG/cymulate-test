@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
     path: "/dashboard",
     element: (
       <AuthGuard>
-        <Dashboard />,
+        <Dashboard />
       </AuthGuard>
     ),
   },
