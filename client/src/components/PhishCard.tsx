@@ -5,7 +5,7 @@ dayjs.extend(relativeTime);
 
 import { Phish as Props } from "../lib/types";
 
-export default function Phish({
+export default function PhishCard({
   _id,
   content,
   recipient,

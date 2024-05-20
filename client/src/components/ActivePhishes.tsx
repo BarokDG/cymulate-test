@@ -1,5 +1,5 @@
 import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
-import Phish from "./Phish";
+import PhishCard from "./PhishCard";
 
 import { Phish as PhishType } from "../lib/types";
 import { useQuery } from "@tanstack/react-query";
@@ -64,7 +64,7 @@ export default function ActivePhishes() {
       <ol className="grid grid-cols-3 gap-10">
         {phishes?.map((phish) => (
           <li key={phish._id}>
-            <Phish {...phish} />
+            <PhishCard {...phish} />
           </li>
         ))}
       </ol>
