@@ -1,7 +1,18 @@
 import { useState } from "react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
 import { Phish as Props } from "../lib/types";
 
-export default function Phish({ _id, content, recipient, status }: Props) {
+export default function Phish({
+  _id,
+  content,
+  recipient,
+  status,
+  createdAt,
+  updatedAt,
+}: Props) {
   const [view, setView] = useState<"preview" | "raw">("preview");
   const toggleView = () => {
     if (view === "preview") {
@@ -13,16 +24,27 @@ export default function Phish({ _id, content, recipient, status }: Props) {
 
   return (
     <div className="bg-blue-100 p-5 border border-black">
-      <div
-        className={`border border-black w-max px-2 rounded-full  ${
-          status === "Pending" ? "bg-gray-100" : "bg-emerald-200"
-        }`}
-      >
-        {status}
+      <div className="flex items-center gap-2">
+        <div
+          className={`border border-black w-max px-2 rounded-full  ${
+            status === "Pending" ? "bg-gray-100" : "bg-emerald-200"
+          }`}
+        >
+          {status}
+        </div>
+        {status === "Successful" && (
+          <p>Clicked {dayjs(updatedAt).format("MMMM DD, YYYY [at] hh:mm a")}</p>
+        )}
       </div>
 
       <div className="w-max font-bold p-0.5 text-lg">{recipient}</div>
       <div className="text-sm">{_id}</div>
+      <div
+        className="text-sm underline decoration-dotted"
+        title={dayjs(createdAt).format("MMMM DD, YYYY hh:mm a")}
+      >
+        {dayjs(createdAt).fromNow()}
+      </div>
 
       <div className="flex flex-col mt-4">
         <button
