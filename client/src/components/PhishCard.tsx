@@ -45,7 +45,7 @@ export default function PhishCard({
         navigate(`phish/${_id}`);
       }}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:gap-2">
         <div
           className={`border border-black w-max px-2 rounded-full  ${
             status === "Pending" ? "bg-gray-100" : "bg-emerald-200"

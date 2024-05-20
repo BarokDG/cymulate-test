@@ -103,7 +103,7 @@ export default function ActivePhishes() {
         </button>
       </div>
 
-      <ol className="grid grid-cols-3 gap-10">
+      <ol className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
         {phishes?.data.map((phish) => (
           <li key={phish._id}>
             <PhishCard {...phish} clickable />
