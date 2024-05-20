@@ -1,43 +1,49 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 
 export default function SignUp() {
   const navigate = useNavigate();
 
+  const { mutate, isPending, isError } = useMutation({
+    mutationFn: ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }): Promise<void> =>
+      fetch(`${import.meta.env.VITE_API_URL}/auth/sign-up`, {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
+      }).then((response) => {
+        if (response.status !== 201) {
+          throw new Error();
+        }
+
+        return;
+      }),
+    onSuccess: () => {
+      navigate("/auth/login");
+    },
+  });
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const [status, setStatus] = useState<"error" | "idle" | "submitting">("idle");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    setStatus("submitting");
-
-    try {
-      const result = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/sign-up`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-          headers: {
-            "Content-type": "application/json",
-          },
-        }
-      );
-
-      if (result.status !== 201) {
-        throw new Error();
-      }
-
-      navigate("/auth/login");
-    } catch (error) {
-      setStatus("error");
-      console.log(error);
-    }
+    mutate({
+      email,
+      password,
+    });
   };
 
   return (
@@ -46,7 +52,7 @@ export default function SignUp() {
         onSubmit={handleSubmit}
         className="w-full max-w-96 flex flex-col gap-4"
       >
-        {status === "error" && (
+        {isError && (
           <p className="bg-red-200 text-red-900 px-2 py-1">
             An error occurred, please try again!
           </p>
@@ -81,9 +87,9 @@ export default function SignUp() {
         <button
           type="submit"
           className="bg-black/80 hover:bg-black text-white py-1 disabled:opacity-40 disabled:cursor-not-allowed"
-          disabled={status === "submitting"}
+          disabled={isPending}
         >
-          {status === "submitting" ? "Submitting..." : "Sign up"}
+          {isPending ? "Submitting..." : "Sign up"}
         </button>
 
         <p className="text-center">

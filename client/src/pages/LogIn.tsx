@@ -1,48 +1,48 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LocalStorageKeys, setItemToLocalStorage } from "../lib/localStorage";
+import { useMutation } from "@tanstack/react-query";
 
 export default function LogIn() {
   const navigate = useNavigate();
 
+  const { mutate, isPending, isError } = useMutation({
+    mutationFn: ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }): Promise<{ access_token: string }> =>
+      fetch(`${import.meta.env.VITE_API_URL}/auth/sign-in`, {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error();
+        }
+
+        return response.json();
+      }),
+    onSuccess: ({ access_token }) => {
+      setItemToLocalStorage(LocalStorageKeys.ACCESS_TOKEN, access_token);
+      navigate("/dashboard");
+    },
+  });
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const [status, setStatus] = useState<"error" | "idle" | "submitting">("idle");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    setStatus("submitting");
-
-    try {
-      const result = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/sign-in`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-          headers: {
-            "Content-type": "application/json",
-          },
-        }
-      );
-
-      if (!result.ok) {
-        throw new Error();
-      }
-
-      const data: { access_token: string } = await result.json();
-
-      setItemToLocalStorage(LocalStorageKeys.ACCESS_TOKEN, data.access_token);
-
-      navigate("/dashboard");
-    } catch (error) {
-      setStatus("error");
-      console.log(error);
-    }
+    mutate({ email, password });
   };
 
   return (
@@ -51,7 +51,7 @@ export default function LogIn() {
         onSubmit={handleSubmit}
         className="w-full max-w-96 flex flex-col gap-4"
       >
-        {status === "error" && (
+        {isError && (
           <p className="bg-red-200 text-red-900 px-2 py-1">
             Please check your email and password and try again!
           </p>
@@ -86,9 +86,9 @@ export default function LogIn() {
         <button
           type="submit"
           className="bg-black/80 hover:bg-black text-white py-1 disabled:opacity-40 disabled:cursor-not-allowed"
-          disabled={status === "submitting"}
+          disabled={isPending}
         >
-          {status === "submitting" ? "Logging you in" : "Log in"}
+          {isPending ? "Logging you in" : "Log in"}
         </button>
 
         <p className="text-center">
