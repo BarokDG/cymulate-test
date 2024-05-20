@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { MouseEventHandler, useState } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
@@ -22,7 +22,9 @@ export default function PhishCard({
   const navigate = useNavigate();
 
   const [view, setView] = useState<"preview" | "raw">("preview");
-  const toggleView = () => {
+  const toggleView: MouseEventHandler = (e) => {
+    e.stopPropagation();
+
     if (view === "preview") {
       setView("raw");
     } else {
