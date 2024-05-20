@@ -1,27 +1,41 @@
+import { useParams } from "react-router-dom";
+import PhishCard from "../components/PhishCard";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
-import PhishCard from "./PhishCard";
-
 import { Phish as PhishType } from "../lib/types";
-import { useQuery } from "@tanstack/react-query";
 
-export default function ActivePhishes() {
+export default function Phish() {
+  const { id } = useParams();
+  const queryClient = useQueryClient();
+
   const {
-    data: phishes,
+    data: phish,
     isPending,
-    isFetching,
     isError,
     refetch,
-  } = useQuery<PhishType[]>({
-    queryKey: ["phishes"],
+  } = useQuery<PhishType>({
+    queryKey: ["phishes", id],
     queryFn: () => {
       const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
 
-      return fetch(`${import.meta.env.VITE_API_URL}/phish`, {
+      return fetch(`${import.meta.env.VITE_API_URL}/phish/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }).then((response) => response.json());
     },
+    initialData: () => {
+      const phishesData: PhishType[] | undefined = queryClient.getQueryData([
+        "phishes",
+      ]);
+
+      if (!phishesData) {
+        return undefined;
+      }
+
+      return phishesData.find((phish) => phish._id === id);
+    },
+    staleTime: 1000,
   });
 
   if (isPending) {
@@ -35,7 +49,7 @@ export default function ActivePhishes() {
   if (isError) {
     return (
       <div className="flex-grow flex flex-col gap-2 justify-center items-center">
-        <h1 className="text-lg">Error getting data. Please try again.</h1>
+        <h1>Error fetching phish data. Please try again.</h1>
         <button
           className="px-4 py-1 bg-blue-700 text-white"
           onClick={() => {
@@ -48,26 +62,9 @@ export default function ActivePhishes() {
     );
   }
 
-  if (phishes.length === 0) {
-    return (
-      <div className="flex-grow flex justify-center items-center">
-        <h1 className="text-lg text-center">
-          Nothing to show. <br /> Create a phish to start tracking.
-        </h1>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-10">
-      {isFetching && <p className="mb-2">Updating...</p>}
-      <ol className="grid grid-cols-3 gap-10">
-        {phishes?.map((phish) => (
-          <li key={phish._id}>
-            <PhishCard {...phish} clickable />
-          </li>
-        ))}
-      </ol>
+    <div className="px-10">
+      <PhishCard {...phish} />
     </div>
   );
 }

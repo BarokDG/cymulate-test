@@ -3,7 +3,12 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
-import { Phish as Props } from "../lib/types";
+import { Phish as PhishType } from "../lib/types";
+import { useNavigate } from "react-router-dom";
+
+interface Props extends PhishType {
+  clickable?: boolean;
+}
 
 export default function PhishCard({
   _id,
@@ -12,7 +17,10 @@ export default function PhishCard({
   status,
   createdAt,
   updatedAt,
+  clickable = false,
 }: Props) {
+  const navigate = useNavigate();
+
   const [view, setView] = useState<"preview" | "raw">("preview");
   const toggleView = () => {
     if (view === "preview") {
@@ -23,7 +31,18 @@ export default function PhishCard({
   };
 
   return (
-    <div className="bg-blue-100 p-5 border border-black">
+    <div
+      className={`bg-blue-100 p-5 border border-black ${
+        clickable ? "cursor-pointer" : "cursor-default"
+      }`}
+      onClick={() => {
+        if (!clickable) {
+          return;
+        }
+
+        navigate(`phish/${_id}`);
+      }}
+    >
       <div className="flex items-center gap-2">
         <div
           className={`border border-black w-max px-2 rounded-full  ${

@@ -1,10 +1,12 @@
-import { createBrowserRouter } from "react-router-dom";
+import { Outlet, createBrowserRouter } from "react-router-dom";
 
 import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import SignUp from "./pages/SignUp";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./layout/Dashboard";
 import AuthGuard from "./components/auth/AuthGuard";
+import Phishes from "./pages/Phishes";
+import Phish from "./pages/Phish";
 
 export const router = createBrowserRouter([
   {
@@ -28,8 +30,20 @@ export const router = createBrowserRouter([
     path: "/dashboard",
     element: (
       <AuthGuard>
-        <Dashboard />
+        <Dashboard>
+          <Outlet />
+        </Dashboard>
       </AuthGuard>
     ),
+    children: [
+      {
+        index: true,
+        element: <Phishes />,
+      },
+      {
+        path: "phish/:id",
+        element: <Phish />,
+      },
+    ],
   },
 ]);
