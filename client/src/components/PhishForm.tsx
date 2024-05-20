@@ -24,6 +24,7 @@ export default function PhishForm() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["phishes"] });
+      setEmail("");
     },
     onError: () => {
       alert("Please try again!");
