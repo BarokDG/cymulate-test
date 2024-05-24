@@ -1,37 +1,123 @@
-import { useEffect, useState } from "react";
-import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
-import Phish from "./Phish";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-import { Phish as PhishType } from "../lib/types";
+import PhishCard from "./PhishCard";
+import StyledPagination from "./StyledPagination";
+import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
+import { Collection, Phish as PhishType } from "../lib/types";
+
+const RESULTS_PER_PAGE_OPTIONS = [5, 10, 25];
 
 export default function ActivePhishes() {
-  const [phishes, setPhishes] = useState<PhishType[] | null>(null);
+  const [page, setPage] = useState(1);
+  const [resultsPerPage, setResultsPerPage] = useState(5);
 
-  useEffect(() => {
-    const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
+  const {
+    data: phishes,
+    isPending,
+    isFetching,
+    isError,
+    refetch,
+  } = useQuery<Collection<PhishType>>({
+    queryKey: ["phishes", page, resultsPerPage],
+    queryFn: () => {
+      const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
 
-    fetch(`${import.meta.env.VITE_API_URL}/phish`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setPhishes(data);
-      });
-  }, []);
+      return fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/phish?page=${page}&limit=${resultsPerPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      ).then((response) => response.json());
+    },
+  });
 
-  if (!phishes || phishes.length === 0) {
-    return <h1>Nothing to show</h1>;
+  if (isPending) {
+    return (
+      <div className="flex-grow flex justify-center items-center">
+        <h1 className="text-lg text-center">Loading...</h1>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex-grow flex flex-col gap-2 justify-center items-center">
+        <h1 className="text-lg">Error getting data. Please try again.</h1>
+        <button
+          className="px-4 py-1 bg-blue-700 text-white"
+          onClick={() => {
+            refetch();
+          }}
+        >
+          Refetch
+        </button>
+      </div>
+    );
+  }
+
+  if (phishes.count === 0) {
+    return (
+      <div className="flex-grow flex justify-center items-center">
+        <h1 className="text-lg text-center">
+          Nothing to show. <br /> Create a phish to start tracking.
+        </h1>
+      </div>
+    );
   }
 
   return (
-    <ol className="grid grid-cols-3 gap-10 p-10">
-      {phishes?.map((phish) => (
-        <li key={phish._id}>
-          <Phish {...phish} />
-        </li>
-      ))}
-    </ol>
+    <div className="p-10 flex flex-col gap-5">
+      {isFetching && <p className="mb-2">Updating...</p>}
+
+      <div className="flex items-center justify-between">
+        <div>
+          <label htmlFor="resultsPerPage">Results per page</label>
+          <select
+            className="border border-black/80 ml-2"
+            id="resultsPerPage"
+            value={resultsPerPage}
+            onChange={(e) => {
+              const { value } = e.target;
+
+              setResultsPerPage(+value);
+            }}
+          >
+            {RESULTS_PER_PAGE_OPTIONS.map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          className="self-end bg-gray-300 px-2 py-1 text-sm"
+          onClick={() => {
+            refetch();
+          }}
+        >
+          Refresh
+        </button>
+      </div>
+
+      <ol className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+        {phishes?.data.map((phish) => (
+          <li key={phish._id}>
+            <PhishCard {...phish} clickable />
+          </li>
+        ))}
+      </ol>
+
+      <StyledPagination
+        current={page}
+        pageSize={resultsPerPage}
+        total={phishes.count}
+        onChange={(newPage) => setPage(newPage)}
+        className="self-center"
+      />
+    </div>
   );
 }

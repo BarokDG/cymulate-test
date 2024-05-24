@@ -1,35 +1,40 @@
 import { FormEvent, useState } from "react";
 import { LocalStorageKeys, getItemFromLocalStorage } from "../lib/localStorage";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function PhishForm() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
+  const queryClient = useQueryClient();
 
-  const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
+  const [email, setEmail] = useState("");
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (email: string) => {
+      const token = getItemFromLocalStorage(LocalStorageKeys.ACCESS_TOKEN);
+
+      return fetch(`${import.meta.env.VITE_API_URL}/phish`, {
+        method: "POST",
+        body: JSON.stringify({
+          recipient: email,
+        }),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-type": "application/json",
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["phishes"] });
+      setEmail("");
+    },
+    onError: () => {
+      alert("Please try again!");
+    },
+  });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    setStatus("submitting");
-
-    const result = await fetch(`${import.meta.env.VITE_API_URL}/phish`, {
-      method: "POST",
-      body: JSON.stringify({
-        recipient: email,
-      }),
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-type": "application/json",
-      },
-    });
-
-    if (result.status !== 201) {
-      alert("Please try again!");
-      return;
-    }
-
-    alert("Phish email sent!");
-    window.location.reload();
+    mutate(email);
   };
 
   return (
@@ -54,9 +59,9 @@ export default function PhishForm() {
         <button
           type="submit"
           className="bg-black/80 hover:bg-black text-white disabled:opacity-40"
-          disabled={status === "submitting"}
+          disabled={isPending}
         >
-          {status === "submitting" ? "Phishing" : "Phish"}
+          {isPending ? "Phishing" : "Phish"}
         </button>
       </form>
     </div>
